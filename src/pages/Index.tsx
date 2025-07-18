@@ -1,11 +1,15 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+      <div className="text-center space-y-6">
+        <h1 className="text-4xl font-bold mb-4">Receipt Scanner</h1>
+        <p className="text-xl text-muted-foreground">Upload and scan your receipts with OCR</p>
+        <Button asChild size="lg">
+          <Link to="/upload-receipt">Upload Receipt</Link>
+        </Button>
       </div>
     </div>
   );
