@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, Upload, X } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Camera, Upload, X, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 interface UploadedFile {
   file: File;
@@ -104,8 +106,19 @@ const UploadReceipt = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full space-y-6">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header with navigation and theme toggle */}
+      <div className="flex items-center justify-between p-4">
+        <Button variant="ghost" size="icon" asChild>
+          <Link to="/">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <ThemeToggle />
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full space-y-6 p-4">
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-foreground">Upload Receipt</h1>
