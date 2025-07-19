@@ -1,18 +1,18 @@
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
+import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
+import { useEffect } from 'react'
 
 const Index = () => {
-  const { user, loading, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { user, loading, signOut } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate("/auth");
+      navigate('/auth')
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate])
 
   if (loading) {
     return (
@@ -22,11 +22,11 @@ const Index = () => {
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!user) {
-    return null;
+    return null
   }
 
   return (
@@ -43,19 +43,21 @@ const Index = () => {
           <ThemeToggle />
         </div>
       </div>
-      
+
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-6">
           <h1 className="text-4xl font-bold mb-4">Receipt Scanner</h1>
-          <p className="text-xl text-muted-foreground">Upload and scan your receipts with OCR</p>
+          <p className="text-xl text-muted-foreground">
+            Upload and scan your receipts with OCR
+          </p>
           <Button asChild size="lg">
             <Link to="/upload-receipt">Upload Receipt</Link>
           </Button>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index

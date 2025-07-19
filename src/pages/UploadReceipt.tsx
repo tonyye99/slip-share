@@ -1,118 +1,118 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Camera, Upload, X, ArrowLeft } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import React, { useState, useRef, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { Camera, Upload, X, ArrowLeft } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 
 interface UploadedFile {
-  file: File;
-  preview: string;
-  id: string;
+  file: File
+  preview: string
+  id: string
 }
 
 const UploadReceipt = () => {
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-  const { user, loading, signOut } = useAuth();
-  const navigate = useNavigate();
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const { toast } = useToast()
+  const { user, loading, signOut } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate("/auth");
+      navigate('/auth')
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate])
 
   const handleFileSelect = (files: FileList | null) => {
-    if (!files) return;
+    if (!files) return
 
-    const newFiles: UploadedFile[] = [];
+    const newFiles: UploadedFile[] = []
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+      const file = files[i]
       if (file.type.startsWith('image/')) {
-        const preview = URL.createObjectURL(file);
+        const preview = URL.createObjectURL(file)
         newFiles.push({
           file,
           preview,
-          id: Math.random().toString(36).substr(2, 9)
-        });
+          id: Math.random().toString(36).substr(2, 9),
+        })
       }
     }
 
-    setUploadedFiles(prev => [...prev, ...newFiles]);
-    
+    setUploadedFiles((prev) => [...prev, ...newFiles])
+
     // Process files for OCR
-    newFiles.forEach(uploadedFile => {
-      processOCR(uploadedFile.file);
-    });
-  };
+    newFiles.forEach((uploadedFile) => {
+      processOCR(uploadedFile.file)
+    })
+  }
 
   const processOCR = async (file: File) => {
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append('image', file);
+    setIsUploading(true)
+    const formData = new FormData()
+    formData.append('image', file)
 
     try {
       const response = await fetch('/api/ocr', {
         method: 'POST',
         body: formData,
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('OCR processing failed');
+        throw new Error('OCR processing failed')
       }
 
-      const result = await response.json();
+      const result = await response.json()
       toast({
-        title: "Receipt processed!",
-        description: "OCR extraction completed successfully.",
-      });
-      
-      console.log('OCR Result:', result);
+        title: 'Receipt processed!',
+        description: 'OCR extraction completed successfully.',
+      })
+
+      console.log('OCR Result:', result)
     } catch (error) {
-      console.error('OCR Error:', error);
+      console.error('OCR Error:', error)
       toast({
-        title: "Processing failed",
-        description: "Failed to extract text from receipt.",
-        variant: "destructive",
-      });
+        title: 'Processing failed',
+        description: 'Failed to extract text from receipt.',
+        variant: 'destructive',
+      })
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   const handleDropzoneClick = () => {
-    fileInputRef.current?.click();
-  };
+    fileInputRef.current?.click()
+  }
 
   const handleCameraClick = () => {
-    cameraInputRef.current?.click();
-  };
+    cameraInputRef.current?.click()
+  }
 
   const removeFile = (id: string) => {
-    setUploadedFiles(prev => {
-      const fileToRemove = prev.find(f => f.id === id);
+    setUploadedFiles((prev) => {
+      const fileToRemove = prev.find((f) => f.id === id)
       if (fileToRemove) {
-        URL.revokeObjectURL(fileToRemove.preview);
+        URL.revokeObjectURL(fileToRemove.preview)
       }
-      return prev.filter(f => f.id !== id);
-    });
-  };
+      return prev.filter((f) => f.id !== id)
+    })
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
+    e.preventDefault()
+    e.stopPropagation()
+  }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleFileSelect(e.dataTransfer.files);
-  };
+    e.preventDefault()
+    e.stopPropagation()
+    handleFileSelect(e.dataTransfer.files)
+  }
 
   if (loading) {
     return (
@@ -122,11 +122,11 @@ const UploadReceipt = () => {
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!user) {
-    return null;
+    return null
   }
 
   return (
@@ -139,9 +139,7 @@ const UploadReceipt = () => {
           </Link>
         </Button>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            {user.email}
-          </span>
+          <span className="text-sm text-muted-foreground">{user.email}</span>
           <Button variant="outline" size="sm" onClick={signOut}>
             Sign Out
           </Button>
@@ -179,7 +177,7 @@ const UploadReceipt = () => {
               </p>
             </div>
           </div>
-          
+
           {isUploading && (
             <div className="absolute inset-0 bg-background/80 rounded-lg flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -247,7 +245,7 @@ const UploadReceipt = () => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default UploadReceipt;
+export default UploadReceipt

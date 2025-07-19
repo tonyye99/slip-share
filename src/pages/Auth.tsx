@@ -1,49 +1,59 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
 
 const Auth = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const { toast } = useToast()
 
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (session) {
-        navigate("/");
+        navigate('/')
       }
-    };
-    checkUser();
+    }
+    checkUser()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        navigate("/");
+        navigate('/')
       }
-    });
+    })
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    return () => subscription.unsubscribe()
+  }, [navigate])
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
+      const redirectUrl = `${window.location.origin}/`
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -51,76 +61,78 @@ const Auth = () => {
           emailRedirectTo: redirectUrl,
           data: {
             display_name: displayName,
-          }
-        }
-      });
+          },
+        },
+      })
 
       if (error) {
-        if (error.message.includes("User already registered")) {
+        if (error.message.includes('User already registered')) {
           toast({
-            title: "Account exists",
-            description: "An account with this email already exists. Please sign in instead.",
-            variant: "destructive",
-          });
+            title: 'Account exists',
+            description:
+              'An account with this email already exists. Please sign in instead.',
+            variant: 'destructive',
+          })
         } else {
           toast({
-            title: "Sign up failed",
+            title: 'Sign up failed',
             description: error.message,
-            variant: "destructive",
-          });
+            variant: 'destructive',
+          })
         }
       } else {
         toast({
-          title: "Check your email",
-          description: "We sent you a confirmation link to complete your registration.",
-        });
+          title: 'Check your email',
+          description:
+            'We sent you a confirmation link to complete your registration.',
+        })
       }
     } catch (error: any) {
       toast({
-        title: "Sign up failed",
+        title: 'Sign up failed',
         description: error.message,
-        variant: "destructive",
-      });
+        variant: 'destructive',
+      })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      });
+      })
 
       if (error) {
-        if (error.message.includes("Invalid login credentials")) {
+        if (error.message.includes('Invalid login credentials')) {
           toast({
-            title: "Sign in failed",
-            description: "Invalid email or password. Please try again.",
-            variant: "destructive",
-          });
+            title: 'Sign in failed',
+            description: 'Invalid email or password. Please try again.',
+            variant: 'destructive',
+          })
         } else {
           toast({
-            title: "Sign in failed",
+            title: 'Sign in failed',
             description: error.message,
-            variant: "destructive",
-          });
+            variant: 'destructive',
+          })
         }
       }
     } catch (error: any) {
       toast({
-        title: "Sign in failed",
+        title: 'Sign in failed',
         description: error.message,
-        variant: "destructive",
-      });
+        variant: 'destructive',
+      })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -128,7 +140,7 @@ const Auth = () => {
       <div className="flex justify-end p-4">
         <ThemeToggle />
       </div>
-      
+
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
@@ -144,7 +156,7 @@ const Auth = () => {
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
@@ -170,11 +182,11 @@ const Auth = () => {
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Signing in..." : "Sign In"}
+                    {loading ? 'Signing in...' : 'Sign In'}
                   </Button>
                 </form>
               </TabsContent>
-              
+
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
@@ -212,7 +224,7 @@ const Auth = () => {
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Creating account..." : "Sign Up"}
+                    {loading ? 'Creating account...' : 'Sign Up'}
                   </Button>
                 </form>
               </TabsContent>
@@ -221,7 +233,7 @@ const Auth = () => {
         </Card>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Auth;
+export default Auth
