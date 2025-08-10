@@ -1,0 +1,22 @@
+export enum ERROR_MESSAGES {
+  RECEIPT_NOT_FOUND = 'Receipt not found',
+  RECEIPT_ACCESS_DENIED = "You don't have permission to view this receipt",
+  RECEIPT_INVALID = 'Invalid receipt data',
+  NETWORK_ERROR = 'Unable to connect to server',
+  UNAUTHORIZED = 'Please login to continue',
+  INTERNAL_SERVER_ERROR = 'Internal server error',
+  SELECTION_SAVE_FAILED = 'Failed to save selection',
+  SELECTION_UPDATE_FAILED = 'Failed to update selection',
+  INVALID_REQUEST_DATA = 'Invalid request data',
+}
+
+export enum ERROR_CODES {
+  RECEIPT_NOT_FOUND = 'RECEIPT_NOT_FOUND',
+  RECEIPT_ACCESS_DENIED = 'RECEIPT_ACCESS_DENIED',
+  RECEIPT_INVALID = 'RECEIPT_INVALID',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
+  SELECTION_SAVE_FAILED = 'SELECTION_SAVE_FAILED',
+  SELECTION_UPDATE_FAILED = 'SELECTION_UPDATE_FAILED',
+  INVALID_REQUEST_DATA = 'INVALID_REQUEST_DATA',
+}

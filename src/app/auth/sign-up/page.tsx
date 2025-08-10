@@ -4,6 +4,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import Link from 'next/link'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/auth-context'
 import {
   Card,
   CardContent,
@@ -13,6 +16,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Form,
   FormControl,
@@ -37,6 +41,12 @@ const signUpSchema = z
 type SignUpForm = z.infer<typeof signUpSchema>
 
 export default function SignUpPage() {
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const { signUp } = useAuth()
+  const router = useRouter()
+
   const form = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -47,9 +57,33 @@ export default function SignUpPage() {
     },
   })
 
-  const onSubmit = (values: SignUpForm) => {
-    console.log('Sign up:', values)
-    // Add your sign-up logic here
+  const onSubmit = async (values: SignUpForm) => {
+    setIsLoading(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const { error } = await signUp(values.email, values.password, {
+        data: { name: values.name },
+      })
+
+      if (error) {
+        setError(error.message)
+      } else {
+        setSuccess(
+          'Account created successfully! Please check your email to verify your account.'
+        )
+        form.reset()
+        // Optionally redirect after a delay
+        setTimeout(() => {
+          router.push('/auth/sign-in')
+        }, 3000)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -63,6 +97,18 @@ export default function SignUpPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {success && (
+              <Alert className="mb-4">
+                <AlertDescription>{success}</AlertDescription>
+              </Alert>
+            )}
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -75,7 +121,11 @@ export default function SignUpPage() {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} />
+                        <Input
+                          placeholder="John Doe"
+                          disabled={isLoading}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -92,6 +142,7 @@ export default function SignUpPage() {
                         <Input
                           type="email"
                           placeholder="john@example.com"
+                          disabled={isLoading}
                           {...field}
                         />
                       </FormControl>
@@ -110,6 +161,7 @@ export default function SignUpPage() {
                         <Input
                           type="password"
                           placeholder="••••••••"
+                          disabled={isLoading}
                           {...field}
                         />
                       </FormControl>
@@ -128,6 +180,7 @@ export default function SignUpPage() {
                         <Input
                           type="password"
                           placeholder="••••••••"
+                          disabled={isLoading}
                           {...field}
                         />
                       </FormControl>
@@ -136,8 +189,8 @@ export default function SignUpPage() {
                   )}
                 />
 
-                <Button type="submit" className="w-full">
-                  Create Account
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Creating account...' : 'Create Account'}
                 </Button>
               </form>
             </Form>
@@ -164,7 +217,11 @@ export default function SignUpPage() {
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-4">
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading}
+                >
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                     <path
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -185,7 +242,11 @@ export default function SignUpPage() {
                   </svg>
                   Google
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading}
+                >
                   <svg
                     className="mr-2 h-4 w-4"
                     fill="currentColor"

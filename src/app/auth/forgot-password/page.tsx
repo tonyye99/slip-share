@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import Link from 'next/link'
+import { useAuth } from '@/contexts/auth-context'
 import {
   Card,
   CardContent,
@@ -32,6 +33,9 @@ type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>
 
 export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const { resetPassword } = useAuth()
 
   const form = useForm<ForgotPasswordForm>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -40,10 +44,23 @@ export default function ForgotPasswordPage() {
     },
   })
 
-  const onSubmit = (values: ForgotPasswordForm) => {
-    console.log('Forgot password:', values)
-    // Add your forgot password logic here
-    setIsSubmitted(true)
+  const onSubmit = async (values: ForgotPasswordForm) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const { error } = await resetPassword(values.email)
+
+      if (error) {
+        setError(error.message)
+      } else {
+        setIsSubmitted(true)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (isSubmitted) {
@@ -107,6 +124,12 @@ export default function ForgotPasswordPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -122,6 +145,7 @@ export default function ForgotPasswordPage() {
                         <Input
                           type="email"
                           placeholder="john@example.com"
+                          disabled={isLoading}
                           {...field}
                         />
                       </FormControl>
@@ -130,8 +154,8 @@ export default function ForgotPasswordPage() {
                   )}
                 />
 
-                <Button type="submit" className="w-full">
-                  Send reset link
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Sending...' : 'Send reset link'}
                 </Button>
               </form>
             </Form>

@@ -4,6 +4,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import Link from 'next/link'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/auth-context'
+import { signInWithGoogle, signInWithGithub } from '@/lib/supabase/oauth'
 import {
   Card,
   CardContent,
@@ -13,6 +17,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Form,
   FormControl,
@@ -30,6 +35,11 @@ const signInSchema = z.object({
 type SignInForm = z.infer<typeof signInSchema>
 
 export default function SignInPage() {
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const { signIn } = useAuth()
+  const router = useRouter()
+
   const form = useForm<SignInForm>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -38,9 +48,39 @@ export default function SignInPage() {
     },
   })
 
-  const onSubmit = (values: SignInForm) => {
-    console.log('Sign in:', values)
-    // Add your sign-in logic here
+  const onSubmit = async (values: SignInForm) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const { error } = await signIn(values.email, values.password)
+
+      if (error) {
+        setError(error.message)
+      } else {
+        router.push('/')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleOAuthSignIn = async (provider: 'google' | 'github') => {
+    try {
+      setError(null)
+      const { error } =
+        provider === 'google'
+          ? await signInWithGoogle()
+          : await signInWithGithub()
+
+      if (error) {
+        setError(error.message)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    }
   }
 
   return (
@@ -54,6 +94,12 @@ export default function SignInPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -69,6 +115,7 @@ export default function SignInPage() {
                         <Input
                           type="email"
                           placeholder="john@example.com"
+                          disabled={isLoading}
                           {...field}
                         />
                       </FormControl>
@@ -87,6 +134,7 @@ export default function SignInPage() {
                         <Input
                           type="password"
                           placeholder="••••••••"
+                          disabled={isLoading}
                           {...field}
                         />
                       </FormControl>
@@ -104,8 +152,8 @@ export default function SignInPage() {
                   </Link>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Sign In
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </form>
             </Form>
@@ -132,7 +180,12 @@ export default function SignInPage() {
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-4">
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading}
+                  onClick={() => handleOAuthSignIn('google')}
+                >
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                     <path
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -153,7 +206,12 @@ export default function SignInPage() {
                   </svg>
                   Google
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading}
+                  onClick={() => handleOAuthSignIn('github')}
+                >
                   <svg
                     className="mr-2 h-4 w-4"
                     fill="currentColor"
