@@ -3,6 +3,8 @@
 // Receipt creation
 export interface CreateReceiptRequest {
   merchant_name?: string
+  merchant_name_en?: string
+  original_language?: string
   currency: string
   tax_percent: number
   service_percent: number
@@ -19,6 +21,7 @@ export interface CreateReceiptRequest {
 
 export interface CreateReceiptItem {
   name: string
+  name_en?: string
   qty: number
   unit_price: number
 }
@@ -49,6 +52,11 @@ export interface OpenAIResponse {
 }
 
 export interface ParsedReceiptData {
+  is_receipt: boolean
+  original_language: string
+  currency: string
+  merchant_name: string
+  merchant_name_en: string
   items: ParsedItem[]
   tax_percent: number
   service_percent: number
@@ -60,6 +68,7 @@ export interface ParsedReceiptData {
 export interface ParsedItem {
   id: string
   name: string
+  name_en: string
   qty: number
   unit_price: number
 }

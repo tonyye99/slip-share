@@ -4,6 +4,8 @@ export interface Receipt {
   id: string
   user_id: string
   merchant_name: string | null
+  merchant_name_en: string | null
+  original_language: string | null
   currency: string
   tax_percent: number
   service_percent: number
@@ -24,6 +26,7 @@ export interface ReceiptItem {
   receipt_id: string
   position: number
   name: string
+  name_en: string | null
   qty: number
   unit_price: number
   created_at: string

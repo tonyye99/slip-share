@@ -10,7 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { ReceiptItemSelectorProps } from '@/types'
+import { useLanguage } from '@/contexts/language-context'
+import { formatCurrency as formatCurrencyHelper } from '@/lib/utils/helpers'
+import type { ReceiptItemSelectorProps } from '@/types/components'
 
 export default function ReceiptItemSelector({
   items,
@@ -18,10 +20,15 @@ export default function ReceiptItemSelector({
   itemShares,
   onItemToggle,
   onShareCountChange,
-  currency = '₿'
+  currency = '₿',
 }: ReceiptItemSelectorProps) {
+  const { getDisplayText } = useLanguage()
+
   const formatCurrency = (amount: number) => {
-    return `${currency}${amount.toFixed(2)}`
+    if (currency === '₿') {
+      return `${currency}${amount.toFixed(2)}`
+    }
+    return formatCurrencyHelper(amount, currency)
   }
 
   const calculateItemTotal = (qty: number, unitPrice: number) => {
@@ -52,7 +59,7 @@ export default function ReceiptItemSelector({
           Choose the items you want to include in your share of the bill
         </p>
       </div>
-      
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -69,9 +76,9 @@ export default function ReceiptItemSelector({
             const isSelected = selectedItems.includes(item.id)
             const itemTotal = calculateItemTotal(item.qty, item.unit_price)
             const shareCount = getShareCount(item.id)
-            
+
             return (
-              <TableRow 
+              <TableRow
                 key={item.id}
                 className={isSelected ? 'bg-muted/50' : ''}
               >
@@ -81,7 +88,9 @@ export default function ReceiptItemSelector({
                     onCheckedChange={() => handleItemCheck(item.id)}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{item.name}</TableCell>
+                <TableCell className="font-medium">
+                  {getDisplayText(item.name, item.name_en)}
+                </TableCell>
                 <TableCell className="text-center">{item.qty}</TableCell>
                 <TableCell className="text-right">
                   {formatCurrency(item.unit_price)}
@@ -96,11 +105,15 @@ export default function ReceiptItemSelector({
                       min="1"
                       max="99"
                       value={shareCount}
-                      onChange={(e) => handleShareCountChange(item.id, e.target.value)}
+                      onChange={(e) =>
+                        handleShareCountChange(item.id, e.target.value)
+                      }
                       disabled={!isSelected}
                       className="w-16 h-8 text-center"
                     />
-                    <span className="text-xs text-muted-foreground">people</span>
+                    <span className="text-xs text-muted-foreground">
+                      people
+                    </span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -108,12 +121,6 @@ export default function ReceiptItemSelector({
           })}
         </TableBody>
       </Table>
-
-      {selectedItems.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>No items selected. Choose items above to see your total.</p>
-        </div>
-      )}
     </div>
   )
 }

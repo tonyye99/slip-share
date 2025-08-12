@@ -96,6 +96,7 @@ Uses `@/*` for `./src/*` path mapping configured in `tsconfig.json`.
 
 ```
 {
+"merchant_name": "Thai Restaurant",
 "items": [
 { "id": "22", "name": "Stir Fried (P) R V", "qty": 1, "unit_price": 289.0 },
 { "id": "24", "name": "BBQ (P) R V", "qty": 1, "unit_price": 279.0 },

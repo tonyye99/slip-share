@@ -6,12 +6,14 @@ import { z } from 'zod'
 
 const Item = z.object({
   name: z.string().min(1),
+  name_en: z.string().optional(),
   qty: z.number().int().positive(),
   unit_price: z.number().int().min(0),
 })
 
 const Payload = z.object({
   merchant_name: z.string().optional(),
+  merchant_name_en: z.string().optional(),
   currency: z
     .string()
     .length(3)
@@ -75,6 +77,7 @@ export async function POST(req: NextRequest) {
     .insert({
       user_id: user.id,
       merchant_name: p.merchant_name ?? null,
+      merchant_name_en: p.merchant_name_en ?? null,
       currency: p.currency,
       tax_percent: p.tax_percent,
       service_percent: p.service_percent,
@@ -103,6 +106,7 @@ export async function POST(req: NextRequest) {
   const rows = p.items.map((i, idx) => ({
     receipt_id: receipt.id,
     name: i.name,
+    name_en: i.name_en ?? null,
     qty: i.qty,
     unit_price: i.unit_price,
     position: idx + 1,

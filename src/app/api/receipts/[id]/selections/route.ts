@@ -6,8 +6,9 @@ import { z } from 'zod'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const supabase = await createClient()
 
@@ -26,7 +27,7 @@ export async function POST(
       )
     }
 
-    const receiptId = params.id
+    const receiptId = id
 
     const SelectionsSchema = z.object({
       selected_items: z.array(z.string()),
@@ -134,8 +135,9 @@ export async function POST(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const supabase = await createClient()
 
@@ -154,7 +156,7 @@ export async function PUT(
       )
     }
 
-    const receiptId = params.id
+    const receiptId = id
 
     const SelectionsSchema = z.object({
       selected_items: z.array(z.string()),

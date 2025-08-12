@@ -5,8 +5,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const supabase = await createClient()
 
@@ -25,7 +26,7 @@ export async function GET(
       )
     }
 
-    const receiptId = params.id
+    const receiptId = id
 
     // Fetch receipt with items
     const { data: receiptResponse, error: receiptError } = await supabase
@@ -38,6 +39,7 @@ export async function GET(
           receipt_id,
           position,
           name,
+          name_en,
           qty,
           unit_price,
           created_at,

@@ -56,3 +56,43 @@ export async function updateSelections(
     throw err
   }
 }
+
+export interface ReceiptSummary {
+  id: string
+  merchant_name: string | null
+  currency: string
+  subtotal: number
+  total: number
+  user_type: 'payer' | 'sharer'
+  created_at: string
+  receipts_items: Array<{
+    id: string
+    name: string
+    qty: number
+    unit_price: number
+  }>
+}
+
+export interface GetReceiptsResponse {
+  receipts: ReceiptSummary[]
+  pagination: {
+    total: number
+    limit: number
+    offset: number
+    hasMore: boolean
+  }
+}
+
+export async function getReceipts(limit: number = 10, offset: number = 0) {
+  try {
+    const params = new URLSearchParams({
+      limit: limit.toString(),
+      offset: offset.toString(),
+    })
+
+    return apiRequest<GetReceiptsResponse>(`/receipts?${params}`)
+  } catch (err) {
+    console.error('Error fetching receipts:', err)
+    throw err
+  }
+}

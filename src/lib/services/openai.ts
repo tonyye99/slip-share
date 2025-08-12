@@ -1,12 +1,15 @@
 import { apiRequest } from '@/lib/api'
 import type { OpenAIResponse } from '@/types/api'
 
-export async function parseReceipt(imageBase64: string) {
+export async function parseReceipt(
+  imageBase64: string,
+  enableTranslation: boolean = false
+) {
   try {
     return apiRequest<OpenAIResponse>('/openai/parse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageBase64 }),
+      body: JSON.stringify({ imageBase64, enableTranslation }),
     })
   } catch (err) {
     console.error('Error parsing receipt:', err)

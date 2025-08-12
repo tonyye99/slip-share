@@ -1,4 +1,5 @@
-import type { ReceiptItem, Receipt, ParsedReceiptData } from './database'
+import type { ReceiptItem, Receipt } from './database'
+import type { ParsedReceiptData } from './api'
 import type { ParsedItem } from './api'
 
 // ReceiptItemSelector component props
