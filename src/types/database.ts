@@ -17,6 +17,7 @@ export interface Receipt {
   issued_at: string | null
   storage_key: string | null
   user_type: 'payer' | 'sharer'
+  share_token: string
   created_at: string
   updated_at: string
 }

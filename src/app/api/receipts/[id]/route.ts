@@ -61,20 +61,19 @@ export async function GET(
       )
     }
     const receipt = receiptResponse as ReceiptWithItems
-    // Check if user has access (either created receipt or has made selections)
+    // Check if user has access (either created the receipt or joined it via its share link)
     const isCreator = receipt.user_id === user.id
     const isPayer = receipt.user_id === user.id && receipt.user_type === 'payer'
 
     if (!isCreator) {
-      // Check if user has existing selections for this receipt
-      const { data: userSelection } = await supabase
-        .from('user_selections')
-        .select('id')
+      const { data: participant } = await supabase
+        .from('receipt_participants')
+        .select('user_id')
         .eq('receipt_id', receiptId)
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
 
-      if (!userSelection) {
+      if (!participant) {
         return NextResponse.json(
           {
             code: ERROR_CODES.RECEIPT_ACCESS_DENIED,

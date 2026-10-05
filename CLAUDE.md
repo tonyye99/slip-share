@@ -42,7 +42,8 @@ SlipShare is a Next.js 15 receipt sharing application that allows users to uploa
 - `receipts` table: Main receipt metadata with user_id, merchant info, tax/service percentages, and user_type
 - `receipts_items` table: Line items linked to receipts via foreign key
 - `user_selections` table: Stores user item selections and share counts
-- Row Level Security (RLS) ensures users only access their own data
+- `receipt_participants` table: People who joined a receipt through its share link (`receipts.share_token`, joined via the `join_receipt` RPC)
+- Row Level Security (RLS) ensures users only access their own data; participants can read receipts they joined, and owners can read everyone's selections
 
 **Receipt Processing Pipeline**:
 
